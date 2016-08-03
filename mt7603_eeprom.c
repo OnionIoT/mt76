@@ -1,17 +1,14 @@
 /*
  * Copyright (C) 2016 Felix Fietkau <nbd@openwrt.org>
  *
- * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
 #include "mt7603.h"
@@ -85,8 +82,8 @@ mt7603_has_cal_free_data(struct mt7603_dev *dev, u8 *efuse)
 	if (get_unaligned_le16(efuse + MT_EE_TX_POWER_0_START_2G) == 0)
 		return false;
 
-	if (get_unaligned_le16(efuse + MT_EE_TX_POWER_1_START_2G) == 0)
-		return false;
+    if (get_unaligned_le16(efuse + MT_EE_TX_POWER_1_START_2G) == 0)
+        return false;
 
 	if (!efuse[MT_EE_CP_FT_VERSION])
 		return false;
@@ -105,30 +102,41 @@ static void
 mt7603_apply_cal_free_data(struct mt7603_dev *dev, u8 *efuse)
 {
 	static const u8 cal_free_bytes[] = {
+      MT_EE_CHIP_ID,
 		MT_EE_TEMP_SENSOR_CAL,
-		MT_EE_TX_POWER_1_START_2G,
-		MT_EE_TX_POWER_1_START_2G + 1,
+        MT_EE_NIC_CONF_0,
+        MT_EE_NIC_CONF_1,
+        MT_EE_NIC_CONF_2,
+        MT_EE_TX_POWER_0_START_2G,
+        MT_EE_TX_POWER_0_START_2G + 1,
+        MT_EE_TX_POWER_1_START_2G,
+        MT_EE_TX_POWER_1_START_2G + 1,
 		MT_EE_CP_FT_VERSION,
 		MT_EE_XTAL_FREQ_OFFSET,
-		MT_EE_XTAL_WF_RFCAL,
-		/* Skip for MT7628 */
-		MT_EE_TX_POWER_0_START_2G,
-		MT_EE_TX_POWER_0_START_2G + 1,
+        MT_EE_XTAL_WF_RFCAL,
+
 	};
-	u8 *eeprom = dev->mt76.eeprom.data;
-	int n = ARRAY_SIZE(cal_free_bytes);
+    u8 *eeprom = dev->mt76.eeprom.data;
+    int n = ARRAY_SIZE(cal_free_bytes);
 	int i;
 
 	if (!mt7603_has_cal_free_data(dev, efuse))
 	    return;
 
-	if (is_mt7628(dev))
-		n -= 2;
-
-	for (i = 0; i < n; i++) {
-	    int offset = cal_free_bytes[i];
-	    eeprom[offset] = efuse[offset];
+//	if (is_mt7628(dev))
+//		n -= 2;
+    eeprom[0x34]=0x11;
+    eeprom[0x42]=0x11;
+    for (i = 0; i < 0x140; i++) {
+        printk("eeprom=%x,offset=%x\n",eeprom[i],i);
+        efuse[i]=eeprom[i];
 	}
+
+    for (i = 0; i < n; i++) {
+        int offset = cal_free_bytes[i];
+       // eeprom[offset] = efuse[offset];
+        printk("efuse=%x,offset=%x\n",efuse[offset],offset);
+    }
 }
 
 

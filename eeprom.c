@@ -1,17 +1,14 @@
 /*
  * Copyright (C) 2016 Felix Fietkau <nbd@openwrt.org>
  *
- * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 #include <linux/of.h>
 #include <linux/of_net.h>
@@ -38,6 +35,7 @@ mt76_get_of_eeprom(struct mt76_dev *dev, int len)
 		return -ENOENT;
 
 	list = of_get_property(np, "mediatek,mtd-eeprom", &size);
+  //  printk("list=%s  \n",(char *)list);
 	if (!list)
 		return -ENOENT;
 
@@ -50,6 +48,7 @@ mt76_get_of_eeprom(struct mt76_dev *dev, int len)
 		return -EINVAL;
 
 	part = of_get_property(np, "label", NULL);
+    printk("part=%s  \n",(char *)part);
 	if (!part)
 		part = np->name;
 
@@ -102,10 +101,12 @@ mt76_eeprom_override(struct mt76_dev *dev)
 
 	if (!is_valid_ether_addr(dev->macaddr)) {
 		eth_random_addr(dev->macaddr);
-		dev_printk(KERN_INFO, dev->dev,
-			   "Invalid MAC address, using random address %pM\n",
+        printk("Invalid MAC address, using random address %pM\n",
 			   dev->macaddr);
-	}
+    }else{
+        printk("valid MAC address %pM\n",
+               dev->macaddr);
+    }
 
 }
 EXPORT_SYMBOL_GPL(mt76_eeprom_override);
