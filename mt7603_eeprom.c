@@ -102,41 +102,42 @@ static void
 mt7603_apply_cal_free_data(struct mt7603_dev *dev, u8 *efuse)
 {
 	static const u8 cal_free_bytes[] = {
-      MT_EE_CHIP_ID,
+		MT_EE_CHIP_ID,
 		MT_EE_TEMP_SENSOR_CAL,
-        MT_EE_NIC_CONF_0,
-        MT_EE_NIC_CONF_1,
-        MT_EE_NIC_CONF_2,
-        MT_EE_TX_POWER_0_START_2G,
-        MT_EE_TX_POWER_0_START_2G + 1,
-        MT_EE_TX_POWER_1_START_2G,
-        MT_EE_TX_POWER_1_START_2G + 1,
+		MT_EE_NIC_CONF_0,
+		MT_EE_NIC_CONF_1,
+		MT_EE_NIC_CONF_2,
+		MT_EE_TX_POWER_0_START_2G,
+		MT_EE_TX_POWER_0_START_2G + 1,
+		MT_EE_TX_POWER_1_START_2G,
+		MT_EE_TX_POWER_1_START_2G + 1,
 		MT_EE_CP_FT_VERSION,
 		MT_EE_XTAL_FREQ_OFFSET,
-        MT_EE_XTAL_WF_RFCAL,
-
+		MT_EE_XTAL_WF_RFCAL,
 	};
-    u8 *eeprom = dev->mt76.eeprom.data;
-    int n = ARRAY_SIZE(cal_free_bytes);
+	u8 *eeprom = dev->mt76.eeprom.data;
+	int n = ARRAY_SIZE(cal_free_bytes);
 	int i;
 
 	if (!mt7603_has_cal_free_data(dev, efuse))
-	    return;
+		return;
 
 //	if (is_mt7628(dev))
 //		n -= 2;
-    eeprom[0x34]=0x11;
-    eeprom[0x42]=0x11;
-    for (i = 0; i < 0x140; i++) {
-        printk("eeprom=%x,offset=%x\n",eeprom[i],i);
-        efuse[i]=eeprom[i];
+	eeprom[0x34]=0x11;
+	eeprom[0x42]=0x11;
+	printk("mt76:mt7603_eeprom.c:: writing eeprom to efuse\n");
+	for (i = 0; i < 0x140; i++) {
+		printk("mt76:mt7603_eeprom.c:: offset=0x%03x, eeprom=0x%03x\n", i, eeprom[i]);
+		efuse[i]=eeprom[i];
 	}
 
-    for (i = 0; i < n; i++) {
-        int offset = cal_free_bytes[i];
-       // eeprom[offset] = efuse[offset];
-        printk("efuse=%x,offset=%x\n",efuse[offset],offset);
-    }
+	printk("mt76:mt7603_eeprom.c:: reading efuse values for the defined cal_free_bytes\n");
+	for (i = 0; i < n; i++) {
+		int offset = cal_free_bytes[i];
+		// eeprom[offset] = efuse[offset];
+		printk("mt76:mt7603_eeprom.c:: offset=0x%03x, efuse=0x%03x\n", offset, efuse[offset]);
+	}
 }
 
 

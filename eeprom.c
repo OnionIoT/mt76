@@ -48,7 +48,7 @@ mt76_get_of_eeprom(struct mt76_dev *dev, int len)
 		return -EINVAL;
 
 	part = of_get_property(np, "label", NULL);
-    printk("part=%s  \n",(char *)part);
+	printk("mt76:eeprom.c:: part=%s  \n",(char *)part);
 	if (!part)
 		part = np->name;
 
@@ -101,11 +101,9 @@ mt76_eeprom_override(struct mt76_dev *dev)
 
 	if (!is_valid_ether_addr(dev->macaddr)) {
 		eth_random_addr(dev->macaddr);
-        printk("Invalid MAC address, using random address %pM\n",
-			   dev->macaddr);
+		printk("mt76:eeprom.c:: Invalid MAC address, using random address %pM\n", dev->macaddr);
     }else{
-        printk("valid MAC address %pM\n",
-               dev->macaddr);
+		printk("mt76:eeprom.c:: Valid MAC address %pM\n", dev->macaddr);
     }
 
 }
